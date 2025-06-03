@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import { Upload, Download, Play, Settings, FileImage } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { AnimationPreview } from '@/components/AnimationPreview';
 import { FileUploader } from '@/components/FileUploader';
 import { ExportOptions } from '@/components/ExportOptions';
+import { exportAnimatedFile } from '@/utils/animationExporter';
 
 const Index = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -56,29 +56,34 @@ const Index = () => {
 
     setIsExporting(true);
     try {
-      // This would integrate with the AnimationRenderer component
       toast({
         title: "Export started!",
         description: `Your ${format.toUpperCase()} file is being generated...`,
       });
       
-      // Simulate export process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await exportAnimatedFile({
+        imageUrl: uploadedImage,
+        animationType: selectedAnimation,
+        resolution: selectedResolution,
+        duration: animationDuration,
+        format
+      });
       
       toast({
         title: "Export completed!",
         description: `Your ${format.toUpperCase()} file has been downloaded.`,
       });
     } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: "Export failed",
-        description: "There was an error generating your animated file.",
+        description: "There was an error generating your animated file. Please try again.",
         variant: "destructive"
       });
     } finally {
       setIsExporting(false);
     }
-  }, [uploadedImage]);
+  }, [uploadedImage, selectedAnimation, selectedResolution, animationDuration]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50">
