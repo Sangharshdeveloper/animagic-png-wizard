@@ -20,14 +20,86 @@ const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const animationTypes = [
-    { value: 'scaleIn', label: 'Scale In' },
-    { value: 'scaleOut', label: 'Scale Out' },
-    { value: 'swirlIn', label: 'Swirl In' },
-    { value: 'fadeIn', label: 'Fade In' },
-    { value: 'slideIn', label: 'Slide In' },
+    // Attention Seekers
     { value: 'bounceIn', label: 'Bounce In' },
+    { value: 'flashIn', label: 'Flash In' },
+    { value: 'rubberbandIn', label: 'Rubberband In' },
+    { value: 'shakeXIn', label: 'ShakeX In' },
+    { value: 'shakeYIn', label: 'ShakeY In' },
+    { value: 'headShakeIn', label: 'Head Shake In' },
+    { value: 'swingIn', label: 'Swing In' },
+    { value: 'tadaIn', label: 'Tada In' },
+    { value: 'wobbleIn', label: 'Wobble In' },
+    { value: 'jelloIn', label: 'Jello In' },
+    { value: 'heartBeatIn', label: 'Heart Beat In' },
+    
+    // Back Entrances
+    { value: 'backInBottom', label: 'Back In Bottom' },
+    { value: 'backInLeft', label: 'Back In Left' },
+    { value: 'backInRight', label: 'Back In Right' },
+    { value: 'backInTop', label: 'Back In Top' },
+    
+    // Bouncing Entrances
+    { value: 'bounceInBottom', label: 'Bounce In Bottom' },
+    { value: 'bounceInLeft', label: 'Bounce In Left' },
+    { value: 'bounceInRight', label: 'Bounce In Right' },
+    { value: 'bounceInTop', label: 'Bounce In Top' },
+    
+    // Fading Entrances
+    { value: 'fadeIn', label: 'Fade In' },
+    { value: 'fadeInBottom', label: 'Fade In Bottom' },
+    { value: 'fadeInBottomBig', label: 'Fade In Bottom Big' },
+    { value: 'fadeInLeft', label: 'Fade In Left' },
+    { value: 'fadeInLeftBig', label: 'Fade In Left Big' },
+    { value: 'fadeInRight', label: 'Fade In Right' },
+    { value: 'fadeInRightBig', label: 'Fade In Right Big' },
+    { value: 'fadeInTop', label: 'Fade In Top' },
+    { value: 'fadeInTopBig', label: 'Fade In Top Big' },
+    { value: 'fadeInTL', label: 'Fade In TL' },
+    { value: 'fadeInTR', label: 'Fade In TR' },
+    { value: 'fadeInBL', label: 'Fade In BL' },
+    { value: 'fadeInBR', label: 'Fade In BR' },
+    
+    // Flippers
+    { value: 'flipIn', label: 'Flip In' },
+    { value: 'flipInX', label: 'Flip In X' },
+    { value: 'flipInY', label: 'Flip In Y' },
+    
+    // Lightspeed
+    { value: 'lightSpeedInRight', label: 'Light Speed In Right' },
+    { value: 'lightSpeedInLeft', label: 'Light Speed In Left' },
+    
+    // Rotating Entrances
     { value: 'rotateIn', label: 'Rotate In' },
-    { value: 'zoomOut', label: 'Zoom Out' }
+    { value: 'rotateInBL', label: 'Rotate In BL' },
+    { value: 'rotateInBR', label: 'Rotate In BR' },
+    { value: 'rotateInTL', label: 'Rotate In TL' },
+    { value: 'rotateInTR', label: 'Rotate In TR' },
+    
+    // Specials
+    { value: 'jackInTheBox', label: 'Jack In The Box' },
+    { value: 'rollIn', label: 'Roll In' },
+    
+    // Zooming Entrances
+    { value: 'zoomIn', label: 'Zoom In' },
+    { value: 'zoomInBottom', label: 'Zoom In Bottom' },
+    { value: 'zoomInLeft', label: 'Zoom In Left' },
+    { value: 'zoomInRight', label: 'Zoom In Right' },
+    { value: 'zoomInTop', label: 'Zoom In Top' },
+    
+    // Sliding Entrances
+    { value: 'slideInBottom', label: 'Slide In Bottom' },
+    { value: 'slideInLeft', label: 'Slide In Left' },
+    { value: 'slideInRight', label: 'Slide In Right' },
+    { value: 'slideInTop', label: 'Slide In Top' },
+    
+    // Custom Complex Animations
+    { value: 'scaleIn', label: 'Scale In' },
+    { value: 'swirlIn', label: 'Swirl In' },
+    { value: 'flipSlitIn', label: 'Flip & Slit In' },
+    { value: 'slideIn', label: 'Slide In' },
+    { value: 'bounceRollIn', label: 'Bounce & Roll In' },
+    { value: 'tiltIn', label: 'Tilt In' }
   ];
 
   const resolutionOptions = [
@@ -135,13 +207,13 @@ const Index = () => {
                     {/* Animation Type */}
                     <div className="space-y-2">
                       <Label htmlFor="animation-type" className="text-sm font-medium text-gray-700">
-                        Animation Effect
+                        Animation Effect ({animationTypes.length} options)
                       </Label>
                       <Select value={selectedAnimation} onValueChange={setSelectedAnimation}>
                         <SelectTrigger className="bg-white/50">
                           <SelectValue placeholder="Select animation" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white">
+                        <SelectContent className="bg-white max-h-64 overflow-y-auto">
                           {animationTypes.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
                               {type.label}
@@ -232,7 +304,7 @@ const Index = () => {
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="bg-purple-100 text-purple-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium mt-0.5">2</span>
-                    <span>Choose your desired animation effect and settings</span>
+                    <span>Choose from {animationTypes.length}+ animation effects and settings</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="bg-purple-100 text-purple-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium mt-0.5">3</span>
