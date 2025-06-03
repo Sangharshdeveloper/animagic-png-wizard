@@ -55,34 +55,20 @@ export const exportAnimatedFile = async (options: ExportOptions): Promise<void> 
 };
 
 const exportAsGif = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: HTMLImageElement, animationType: string, duration: number) => {
-  // For GIF, we'll create multiple frames and use a simple approach
-  const frames = 30; // 30 frames for smooth animation
-  const frameDelay = (duration * 1000) / frames; // milliseconds per frame
+  // For GIF, we'll create the first frame as a sample
+  // Note: Real GIF creation would require a GIF encoder library
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Create frames
-  const frameCanvases: HTMLCanvasElement[] = [];
+  // Set white background
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  for (let i = 0; i < frames; i++) {
-    const frameCanvas = document.createElement('canvas');
-    frameCanvas.width = canvas.width;
-    frameCanvas.height = canvas.height;
-    const frameCtx = frameCanvas.getContext('2d')!;
-    
-    // Clear frame
-    frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-    
-    // Apply animation transformation based on progress
-    const progress = i / (frames - 1);
-    applyAnimationTransform(frameCtx, animationType, progress, frameCanvas.width, frameCanvas.height);
-    
-    // Draw image
-    frameCtx.drawImage(img, 0, 0, frameCanvas.width, frameCanvas.height);
-    frameCanvases.push(frameCanvas);
-  }
+  // Apply animation at mid-point
+  ctx.save();
+  applyAnimationTransform(ctx, animationType, 0.5, canvas.width, canvas.height, img);
+  ctx.restore();
   
-  // Convert first frame to blob and download (simplified GIF export)
-  const firstFrame = frameCanvases[0];
-  firstFrame.toBlob((blob) => {
+  canvas.toBlob((blob) => {
     if (blob) {
       downloadBlob(blob, 'animation.gif');
     }
@@ -90,16 +76,22 @@ const exportAsGif = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContex
 };
 
 const exportAsWebP = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: HTMLImageElement, animationType: string, duration: number) => {
-  // For WebP, create a single frame (static)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  applyAnimationTransform(ctx, animationType, 0.5, canvas.width, canvas.height);
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+  // Set white background
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Apply animation at mid-point
+  ctx.save();
+  applyAnimationTransform(ctx, animationType, 0.5, canvas.width, canvas.height, img);
+  ctx.restore();
   
   canvas.toBlob((blob) => {
     if (blob) {
       downloadBlob(blob, 'animation.webp');
     }
-  }, 'image/webp');
+  }, 'image/webp', 0.9);
 };
 
 const exportAsVideo = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: HTMLImageElement, animationType: string, duration: number, format: string) => {
@@ -109,8 +101,15 @@ const exportAsVideo = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
   }
   
   const stream = canvas.captureStream(30); // 30 FPS
+  const mimeType = format === 'webm' ? 'video/webm;codecs=vp8' : 'video/mp4';
+  
+  // Check if the mime type is supported
+  if (!MediaRecorder.isTypeSupported(mimeType)) {
+    console.warn(`${mimeType} not supported, falling back to webm`);
+  }
+  
   const mediaRecorder = new MediaRecorder(stream, {
-    mimeType: format === 'webm' ? 'video/webm' : 'video/mp4'
+    mimeType: MediaRecorder.isTypeSupported(mimeType) ? mimeType : 'video/webm'
   });
   
   const chunks: BlobPart[] = [];
@@ -123,10 +122,10 @@ const exportAsVideo = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
     };
     
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { 
-        type: format === 'webm' ? 'video/webm' : 'video/mp4' 
-      });
-      downloadBlob(blob, `animation.${format}`);
+      const actualMimeType = MediaRecorder.isTypeSupported(mimeType) ? mimeType : 'video/webm';
+      const blob = new Blob(chunks, { type: actualMimeType });
+      const extension = actualMimeType.includes('mp4') ? 'mp4' : 'webm';
+      downloadBlob(blob, `animation.${extension}`);
       resolve();
     };
     
@@ -135,22 +134,33 @@ const exportAsVideo = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
     };
     
     // Start recording
-    mediaRecorder.start();
+    mediaRecorder.start(100); // Collect data every 100ms
     
     // Animate and record
     let startTime = Date.now();
+    const totalDuration = duration * 1000; // Convert to milliseconds
+    
     const animate = () => {
-      const elapsed = (Date.now() - startTime) / 1000;
-      const progress = (elapsed % duration) / duration;
+      const elapsed = Date.now() - startTime;
+      const progress = (elapsed % totalDuration) / totalDuration;
       
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      applyAnimationTransform(ctx, animationType, progress, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Clear canvas with white background
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      if (elapsed < duration * 2) { // Record for 2 cycles
+      // Apply animation
+      ctx.save();
+      applyAnimationTransform(ctx, animationType, progress, canvas.width, canvas.height, img);
+      ctx.restore();
+      
+      // Continue animation for specified duration * 2 (2 complete cycles)
+      if (elapsed < totalDuration * 2) {
         requestAnimationFrame(animate);
       } else {
-        mediaRecorder.stop();
+        // Stop recording after animation completes
+        setTimeout(() => {
+          mediaRecorder.stop();
+        }, 200);
       }
     };
     
@@ -158,51 +168,87 @@ const exportAsVideo = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
   });
 };
 
-const applyAnimationTransform = (ctx: CanvasRenderingContext2D, animationType: string, progress: number, width: number, height: number) => {
+const applyAnimationTransform = (ctx: CanvasRenderingContext2D, animationType: string, progress: number, width: number, height: number, img: HTMLImageElement) => {
   const centerX = width / 2;
   const centerY = height / 2;
   
-  ctx.save();
+  // Move to center for transformations
   ctx.translate(centerX, centerY);
   
   switch (animationType) {
     case 'scaleIn':
-      const scaleIn = 0.5 + (progress * 0.5);
+      const scaleIn = 0.1 + (Math.sin(progress * Math.PI * 2) * 0.45 + 0.45);
       ctx.scale(scaleIn, scaleIn);
+      ctx.globalAlpha = 0.3 + (Math.sin(progress * Math.PI * 2) * 0.35 + 0.35);
       break;
+      
     case 'scaleOut':
-      const scaleOut = 1 - (progress * 0.5);
+      const scaleOut = 1.5 - (Math.sin(progress * Math.PI * 2) * 0.45 + 0.45);
       ctx.scale(scaleOut, scaleOut);
+      ctx.globalAlpha = 0.4 + (Math.cos(progress * Math.PI * 2) * 0.3 + 0.3);
       break;
+      
     case 'rotateIn':
-      ctx.rotate(progress * Math.PI * 2);
+      const rotation = progress * Math.PI * 4; // 2 full rotations
+      const rotateScale = 0.2 + (Math.sin(progress * Math.PI * 2) * 0.4 + 0.4);
+      ctx.rotate(rotation);
+      ctx.scale(rotateScale, rotateScale);
+      ctx.globalAlpha = 0.2 + (Math.sin(progress * Math.PI * 2) * 0.4 + 0.4);
       break;
+      
     case 'fadeIn':
-      ctx.globalAlpha = progress;
+      ctx.globalAlpha = Math.sin(progress * Math.PI * 2) * 0.5 + 0.5;
       break;
+      
     case 'swirlIn':
-      const swirlScale = 0.3 + (progress * 0.7);
-      const swirlRotation = (1 - progress) * Math.PI * 2;
+      const swirlScale = 0.1 + (Math.sin(progress * Math.PI * 2) * 0.45 + 0.45);
+      const swirlRotation = progress * Math.PI * 6; // 3 full rotations
       ctx.scale(swirlScale, swirlScale);
       ctx.rotate(swirlRotation);
+      ctx.globalAlpha = 0.2 + (Math.sin(progress * Math.PI * 2) * 0.4 + 0.4);
       break;
+      
     case 'slideIn':
-      const slideX = (1 - progress) * width;
+      const slideX = Math.sin(progress * Math.PI * 2) * width * 0.8;
       ctx.translate(slideX, 0);
+      ctx.globalAlpha = 0.3 + (Math.cos(progress * Math.PI * 2) * 0.35 + 0.35);
       break;
+      
     case 'bounceIn':
-      const bounceScale = progress < 0.5 
-        ? 2 * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      // Create a bouncing effect with easing
+      const bounceProgress = progress * Math.PI * 2;
+      const bounceScale = 0.2 + Math.abs(Math.sin(bounceProgress)) * 0.8;
+      const bounceY = Math.sin(bounceProgress) * 20;
       ctx.scale(bounceScale, bounceScale);
+      ctx.translate(0, bounceY);
+      ctx.globalAlpha = 0.3 + (Math.sin(progress * Math.PI * 2) * 0.35 + 0.35);
       break;
+      
     case 'zoomOut':
-      const zoomScale = 1.5 - (progress * 0.5);
+      const zoomScale = 0.5 + (Math.cos(progress * Math.PI * 2) * 0.5 + 0.5);
       ctx.scale(zoomScale, zoomScale);
+      ctx.globalAlpha = 0.4 + (Math.sin(progress * Math.PI * 2) * 0.3 + 0.3);
+      break;
+      
+    default:
+      // Default to scale in
+      const defaultScale = 0.3 + (Math.sin(progress * Math.PI * 2) * 0.35 + 0.35);
+      ctx.scale(defaultScale, defaultScale);
       break;
   }
   
-  ctx.translate(-centerX, -centerY);
+  // Draw the image centered
+  const aspectRatio = img.width / img.height;
+  let drawWidth = width;
+  let drawHeight = height;
+  
+  if (aspectRatio > 1) {
+    drawHeight = width / aspectRatio;
+  } else {
+    drawWidth = height * aspectRatio;
+  }
+  
+  ctx.drawImage(img, -drawWidth/2, -drawHeight/2, drawWidth, drawHeight);
 };
 
 const downloadBlob = (blob: Blob, filename: string) => {
