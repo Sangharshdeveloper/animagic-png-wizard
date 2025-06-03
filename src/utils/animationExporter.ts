@@ -1,3 +1,4 @@
+
 export interface ExportOptions {
   imageUrl: string;
   animationType: string;
@@ -394,14 +395,14 @@ const applyAnimationTransform = (ctx: CanvasRenderingContext2D, animationType: s
       break;
       
     case 'flipInX':
-      const flipXRotation = (1 - progress) * Math.PI;
-      ctx.rotateX ? ctx.rotateX(flipXRotation) : ctx.scale(1, Math.cos(flipXRotation));
+      const flipXScale = Math.abs(Math.cos(progress * Math.PI));
+      ctx.scale(1, flipXScale);
       ctx.globalAlpha = Math.sin(progress * Math.PI);
       break;
       
     case 'flipInY':
-      const flipYRotation = (1 - progress) * Math.PI;
-      ctx.scale(Math.cos(flipYRotation), 1);
+      const flipYScale = Math.abs(Math.cos(progress * Math.PI));
+      ctx.scale(flipYScale, 1);
       ctx.globalAlpha = Math.sin(progress * Math.PI);
       break;
 
