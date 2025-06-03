@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,6 +85,48 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'scale-in': {
+					'0%': { transform: 'scale(0)', opacity: '0' },
+					'50%': { transform: 'scale(1)', opacity: '1' },
+					'100%': { transform: 'scale(0)', opacity: '0' }
+				},
+				'scale-out': {
+					'0%': { transform: 'scale(1)', opacity: '1' },
+					'50%': { transform: 'scale(0)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				'swirl-in': {
+					'0%': { transform: 'scale(0) rotate(-360deg)', opacity: '0' },
+					'50%': { transform: 'scale(1) rotate(0deg)', opacity: '1' },
+					'100%': { transform: 'scale(0) rotate(360deg)', opacity: '0' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'50%': { opacity: '1' },
+					'100%': { opacity: '0' }
+				},
+				'slide-in': {
+					'0%': { transform: 'translateX(-100%)', opacity: '0' },
+					'50%': { transform: 'translateX(0)', opacity: '1' },
+					'100%': { transform: 'translateX(100%)', opacity: '0' }
+				},
+				'bounce-in': {
+					'0%': { transform: 'scale(0)', opacity: '0' },
+					'25%': { transform: 'scale(1.1)', opacity: '1' },
+					'50%': { transform: 'scale(0.9)', opacity: '1' },
+					'75%': { transform: 'scale(1.05)', opacity: '1' },
+					'100%': { transform: 'scale(0)', opacity: '0' }
+				},
+				'rotate-in': {
+					'0%': { transform: 'rotate(-180deg) scale(0)', opacity: '0' },
+					'50%': { transform: 'rotate(0deg) scale(1)', opacity: '1' },
+					'100%': { transform: 'rotate(180deg) scale(0)', opacity: '0' }
+				},
+				'zoom-out': {
+					'0%': { transform: 'scale(1)', opacity: '1' },
+					'50%': { transform: 'scale(2)', opacity: '0.5' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
 				}
 			},
 			animation: {
