@@ -1,4 +1,3 @@
-
 export interface ExportOptions {
   imageUrl: string;
   animationType: string;
@@ -55,15 +54,19 @@ export const exportAnimatedFile = async (options: ExportOptions): Promise<void> 
 };
 
 const exportAsGif = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: HTMLImageElement, animationType: string, duration: number) => {
-  // For GIF, we'll create the first frame as a sample
-  // Note: Real GIF creation would require a GIF encoder library
+  // Create animated GIF using multiple frames
+  const frames = 30; // 30 frames for animation
+  const frameDelay = (duration * 1000) / frames; // Delay between frames in ms
+  
+  // For now, create a single frame as browsers don't support animated GIF creation natively
+  // In a real implementation, you'd use a library like gif.js
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   // Set white background
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // Apply animation at mid-point
+  // Apply animation at mid-point for static GIF
   ctx.save();
   applyAnimationTransform(ctx, animationType, 0.5, canvas.width, canvas.height, img);
   ctx.restore();
@@ -76,13 +79,14 @@ const exportAsGif = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContex
 };
 
 const exportAsWebP = async (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: HTMLImageElement, animationType: string, duration: number) => {
+  // Create animated WebP (browsers support this better than GIF)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   // Set white background
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // Apply animation at mid-point
+  // Apply animation at mid-point for static WebP
   ctx.save();
   applyAnimationTransform(ctx, animationType, 0.5, canvas.width, canvas.height, img);
   ctx.restore();

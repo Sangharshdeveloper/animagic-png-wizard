@@ -27,30 +27,22 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({
     if (!img) return;
 
     // Remove existing animation classes
-    img.className = 'w-full h-full object-contain transition-all';
-    
-    // Apply animation based on type
-    const animationClass = getAnimationClass(animationType);
+    img.className = 'w-full h-full object-contain';
     
     // Force reflow and apply animation
     void img.offsetWidth;
     img.style.animationDuration = `${duration}s`;
+    img.style.animationIterationCount = 'infinite';
+    img.style.animationTimingFunction = 'ease-in-out';
+    
+    // Apply the animation class
+    const animationClass = getAnimationClass(animationType);
     img.className += ` ${animationClass}`;
 
   }, [imageUrl, animationType, duration]);
 
   const getAnimationClass = (type: string): string => {
-    const animations = {
-      scaleIn: 'animate-[scale-in_var(--duration)_ease-out_infinite]',
-      scaleOut: 'animate-[scale-out_var(--duration)_ease-out_infinite]',
-      swirlIn: 'animate-[swirl-in_var(--duration)_ease-out_infinite]',
-      fadeIn: 'animate-[fade-in_var(--duration)_ease-out_infinite]',
-      slideIn: 'animate-[slide-in_var(--duration)_ease-out_infinite]',
-      bounceIn: 'animate-[bounce-in_var(--duration)_ease-out_infinite]',
-      rotateIn: 'animate-[rotate-in_var(--duration)_ease-out_infinite]',
-      zoomOut: 'animate-[zoom-out_var(--duration)_ease-out_infinite]'
-    };
-    return animations[type as keyof typeof animations] || animations.scaleIn;
+    return `animate-${type}`;
   };
 
   const getAspectRatio = (resolution: string): string => {
@@ -86,7 +78,7 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({
           <img
             src={imageUrl}
             alt="Animation Preview"
-            className="w-full h-full object-contain transition-all"
+            className="w-full h-full object-contain"
           />
         </div>
       </div>

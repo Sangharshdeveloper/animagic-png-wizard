@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Download, Play, Settings, FileImage } from 'lucide-react';
+import { Upload, Download, Play, Settings, FileImage, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,7 @@ import { AnimationPreview } from '@/components/AnimationPreview';
 import { FileUploader } from '@/components/FileUploader';
 import { ExportOptions } from '@/components/ExportOptions';
 import { exportAnimatedFile } from '@/utils/animationExporter';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -17,6 +18,7 @@ const Index = () => {
   const [selectedResolution, setSelectedResolution] = useState<string>('1:1');
   const [animationDuration, setAnimationDuration] = useState<number>(2);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const animationTypes = [
@@ -163,7 +165,7 @@ const Index = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
                 <FileImage className="w-6 h-6 text-white" />
               </div>
@@ -173,8 +175,40 @@ const Index = () => {
                 </h1>
                 <p className="text-sm text-gray-600">Create stunning animated files from your PNGs</p>
               </div>
-            </div>
+            </Link>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link to="/about" className="text-gray-600 hover:text-purple-600 transition-colors">About</Link>
+              <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
+              <Link to="/privacy" className="text-gray-600 hover:text-purple-600 transition-colors">Privacy</Link>
+              <Link to="/terms" className="text-gray-600 hover:text-purple-600 transition-colors">Terms</Link>
+              <Link to="/disclaimer" className="text-gray-600 hover:text-purple-600 transition-colors">Disclaimer</Link>
+            </nav>
+            
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
           </div>
+          
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <nav className="md:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+              <div className="flex flex-col space-y-3">
+                <Link to="/about" className="text-gray-600 hover:text-purple-600 transition-colors" onClick={() => setMobileMenuOpen(false)}>About</Link>
+                <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+                <Link to="/privacy" className="text-gray-600 hover:text-purple-600 transition-colors" onClick={() => setMobileMenuOpen(false)}>Privacy</Link>
+                <Link to="/terms" className="text-gray-600 hover:text-purple-600 transition-colors" onClick={() => setMobileMenuOpen(false)}>Terms</Link>
+                <Link to="/disclaimer" className="text-gray-600 hover:text-purple-600 transition-colors" onClick={() => setMobileMenuOpen(false)}>Disclaimer</Link>
+              </div>
+            </nav>
+          )}
         </div>
       </header>
 
