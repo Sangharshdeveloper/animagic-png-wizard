@@ -17,20 +17,20 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({ onExport, isExport
       icon: FileVideo,
       color: 'bg-green-500'
     },
-    {
-      format: 'webp',
-      label: 'WebP',
-      description: 'Modern image format',
-      icon: Image,
-      color: 'bg-blue-500'
-    },
-    {
-      format: 'gif',
-      label: 'GIF',
-      description: 'Universal compatibility',
-      icon: Film,
-      color: 'bg-purple-500'
-    },
+    // {
+    //   format: 'webp',
+    //   label: 'WebP',
+    //   description: 'Modern image format',
+    //   icon: Image,
+    //   color: 'bg-blue-500'
+    // },
+    // {
+    //   format: 'gif',
+    //   label: 'GIF',
+    //   description: 'Universal compatibility',
+    //   icon: Film,
+    //   color: 'bg-purple-500'
+    // },
     {
       format: 'mp4',
       label: 'MP4',

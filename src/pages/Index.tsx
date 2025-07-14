@@ -166,12 +166,12 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
-                <FileImage className="w-6 h-6 text-white" />
-              </div>
+              {/* <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center"> */}
+               <img src="/logo.png" alt="" className="sr" height={70} width={70}/>
+              {/* </div> */}
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  PNG Animator
+                  Image Spark
                 </h1>
                 <p className="text-sm text-gray-600">Create stunning animated files from your PNGs</p>
               </div>
@@ -346,7 +346,7 @@ const Index = () => {
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="bg-purple-100 text-purple-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium mt-0.5">4</span>
-                    <span>Export in your preferred format (WebM, WebP, GIF, MP4)</span>
+                    <span>Export in your preferred format (WebM, MP4)</span>
                   </li>
                 </ol>
               </CardContent>
